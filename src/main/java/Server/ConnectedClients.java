@@ -17,7 +17,7 @@ public class ConnectedClients {
         AtomicBoolean isNotFound = new AtomicBoolean(true);
         serversList.forEach(s -> {
             if (s != serverThread) {
-                if (s.getSocketOwner()!=null && s.getSocketOwner().equals(msg)) {
+                if (s.getSocketOwner() != null && s.getSocketOwner().equals(msg)) {
                     isNotFound.set(false);
                 }
             }
@@ -25,7 +25,7 @@ public class ConnectedClients {
         return isNotFound.get();
     }
 
-    protected void remove(ServerThread serverThread){
+    protected void remove(ServerThread serverThread) {
         if (serversList.contains(serverThread)) {
             serversList.remove(serverThread);
         }
