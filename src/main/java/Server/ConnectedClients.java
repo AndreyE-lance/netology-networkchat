@@ -13,11 +13,11 @@ public class ConnectedClients {
         }
     }
 
-    protected boolean isCorrectName(String msg, ServerThread serverThread) {
+    protected synchronized boolean isCorrectName(String nickName, ServerThread serverThread) {
         AtomicBoolean isNotFound = new AtomicBoolean(true);
-        serversList.forEach(s -> {
-            if (s != serverThread) {
-                if (s.getSocketOwner() != null && s.getSocketOwner().equals(msg)) {
+        getServersList().forEach(s -> {
+            if (s!=serverThread) {
+                if (s.getSocketOwner() != null && s.getSocketOwner().equals(nickName)) {
                     isNotFound.set(false);
                 }
             }
@@ -26,9 +26,7 @@ public class ConnectedClients {
     }
 
     protected void remove(ServerThread serverThread) {
-        if (serversList.contains(serverThread)) {
-            serversList.remove(serverThread);
-        }
+        serversList.remove(serverThread);
     }
 
     public List<ServerThread> getServersList() {

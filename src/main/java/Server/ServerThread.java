@@ -19,6 +19,7 @@ public class ServerThread extends Thread {
     final static String HISTORY_PATH = "src" + File.separator + "history" + File.separator + "History.log";
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
+
     public ServerThread(SocketChannel socketChannel, ConnectedClients connectedClients) {
         this.connectedClients = connectedClients;
         this.setDaemon(true);
@@ -58,7 +59,7 @@ public class ServerThread extends Thread {
                 isFirstRun = false;
                 socketOwner = msg;
                 inputByteBuffer.clear();
-                broadcastSend("SYS: [" + socketOwner + "]: вошел в чат.");
+                broadcastSend("SYS: [" + socketOwner + "]: вошел в чат.\n");
             } else {
                 inputByteBuffer.clear();
                 logHistory("[" + socketOwner + "]: " + msg);
@@ -84,7 +85,7 @@ public class ServerThread extends Thread {
     }
 
     private synchronized void logHistory(String msg) {
-        try (BufferedWriter bWriter = new BufferedWriter(new FileWriter(HISTORY_PATH))) {
+        try (BufferedWriter bWriter = new BufferedWriter(new FileWriter(HISTORY_PATH, true))) {
             bWriter.write(dateFormat.format(new Date()) + " : " + msg);
             bWriter.flush();
         } catch (IOException e) {
@@ -93,16 +94,17 @@ public class ServerThread extends Thread {
         }
     }
 
-    private void broadcastSend(String msg) {
 
+    protected String broadcastSend(String msg) {
         for (ServerThread server : connectedClients.getServersList()) {
             try {
                 server.socketChannel.write(ByteBuffer.wrap(msg.getBytes(StandardCharsets.UTF_8)));
             } catch (IOException e) {
                 Server.logger.trace(e.getMessage());
-                e.printStackTrace();
+                return "ERROR";
             }
         }
+        return "OK";
     }
 
     public String getSocketOwner() {
