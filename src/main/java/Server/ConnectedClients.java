@@ -2,10 +2,11 @@ package Server;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ConnectedClients {
-    private List<ServerThread> serversList = new LinkedList<>();
+    private volatile List<ServerThread> serversList = new LinkedList<>();
 
     protected void addServer(ServerThread serverThread) {
         if (!serversList.contains(serverThread)) {
@@ -14,7 +15,7 @@ public class ConnectedClients {
     }
 
     protected synchronized boolean isCorrectName(String nickName, ServerThread serverThread) {
-        AtomicBoolean isNotFound = new AtomicBoolean(true);
+        /*AtomicBoolean isNotFound = new AtomicBoolean(true);
         getServersList().forEach(s -> {
             if (s!=serverThread) {
                 if (s.getSocketOwner() != null && s.getSocketOwner().equals(nickName)) {
@@ -22,7 +23,12 @@ public class ConnectedClients {
                 }
             }
         });
-        return isNotFound.get();
+        return isNotFound.get();*/
+        return getServersList().stream()
+                .filter(s -> s != serverThread)
+                .map(s -> s.getSocketOwner())
+                .filter(Objects::nonNull)
+                .anyMatch(nickName::equals);
     }
 
     protected void remove(ServerThread serverThread) {
